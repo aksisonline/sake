@@ -15,7 +15,7 @@ on a second machine.
 | `XPackage` answers the user's locale, so the game gets past its first screen | PR [typester/sake#27](https://github.com/typester/sake/pull/27), branch `fix/xpackage-user-locale` | Open. Played about two to three hours with it. |
 | A docs note that a video can have sound and no picture | the same PR | Open. |
 | `XGameSave` kept as files in the bottle, so progress is saved | PR [typester/sake#28](https://github.com/typester/sake/pull/28), branch `feat/xgamesave` | Draft, stacked on #27. Saved and reloaded in the game. |
-| Video: Wine rebuilt with GStreamer | **Nowhere in sake's code.** Scripts in [tools/](tools/) and the steps in INSTRUCTIONS.md | Local only. Decodes the game's clip in a test program. **Not seen working inside the game.** |
+| Video: Wine rebuilt with GStreamer | **Nowhere in sake's code.** Scripts in [tools/](tools/) and the steps in INSTRUCTIONS.md | Local only. Decodes the game's clip in a test program, and **the TV scene played in the game** (2026-11-28). |
 | These notes | branch `docs/forever-ago-field-notes` in the fork | Not a pull request. |
 
 ## Timeline and findings
@@ -151,7 +151,7 @@ left unanswered.
 
 That also covers the async calls the game uses, which the test program did not.
 
-### 5. Video: a local fix that decodes in a test and is not yet seen in the game
+### 5. Video: a local fix, and the TV scene plays with it
 
 sake's own build has no GStreamer, so the fix is to give Wine one. A source build of GStreamer
 under Rosetta is hours; GStreamer publishes universal (x86_64 + arm64) macOS packages, so those
@@ -178,14 +178,20 @@ were used instead.
 the bottle and decoded 30 frames, with the right timestamps and an AAC audio stream. Before the
 change the same file did not open.
 
-**What was not shown.**
+**Then in the game.** On 2026-11-28 the player reported that the TV scene, which before had
+sound only, now works. The game's log of that day no longer has the `Unsupported bytestream
+type` refusal (`0xc00d36c4`).
 
-- That it plays inside the game. The player was already past the TV scene and had no other
-  video to reach, so the in-game result is unknown.
-- The test asked for RGB32 and Wine answered `0xC00D5212`; frames came back as NV12 (the
-  decoder's format). Whether Unity asks for something Wine can give is unknown.
-- GStreamer printed `gst_video_info_from_caps: assertion 'gst_caps_is_fixed (caps)' failed`.
-  Its meaning is unknown.
+**What still shows in the logs, and what was not shown.**
+
+- `WindowsVideoMedia error 0x80004002` ("Querying IUnknown interface on D3D11 device") still
+  precedes videos in `Player.log`, along with `Color primaries 0 is unknown or unsupported`.
+  Neither stopped the TV scene.
+- GStreamer prints `gst_video_info_from_caps: assertion 'gst_caps_is_fixed (caps)' failed` in
+  the title's log. Its meaning is unknown.
+- The test program asked for RGB32 and Wine answered `0xC00D5212`; frames came back as NV12
+  (the decoder's format). The game evidently manages, but how was not looked into.
+- Only the TV scene was reported. The other two videos were not confirmed by anyone watching.
 - VP9: `libvpx` loads, but no clip here needs it (`ffprobe` says all three are H.264), so it was
   not exercised.
 
@@ -208,7 +214,7 @@ change the same file did not open.
 ## Not done
 
 - The stuck down arrow (section 3b).
-- Video inside the game (section 5).
+- Watching the other two videos in the game (section 5).
 - Turning the video setup into sake's own build: a pinned GStreamer fetch, bundling the
   libraries so the engine stays movable, `--with-gstreamer`, and the soname pinning the rest of
   the engine has. That is a design change to `BuildRecipe.swift` and `WineBuilder.swift` and

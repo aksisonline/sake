@@ -180,10 +180,11 @@ GStreamer-Video `gst_caps_is_fixed` assertion.
 Without the video setup, `CreateSourceReader` fails: that is the same refusal the game logs as
 `Unsupported bytestream type`.
 
-### 2f. The part that is not proven
+### 2f. In the game
 
-Whether the game plays a video with this. The TV scene in Forever Ago was not re-reachable
-after it had passed. If a video does not play in a game, read, in this order:
+Forever Ago's TV scene played with this setup (the owner's report, 2026-11-28); its other two
+videos were not confirmed. Some video messages stay in the logs even when the picture shows
+(README section 5). If a video does not play in a game, read, in this order:
 
 1. The game's `Player.log` (`drive_c/users/crossover/AppData/LocalLow/<studio>/<game>/Player.log`)
    for `WindowsVideoMedia error` lines. The old `0xc00d36c4` means the module is not being used.
